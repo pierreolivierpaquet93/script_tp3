@@ -146,13 +146,8 @@ class TestCompteBancaire(unittest.TestCase):
         nom = "Pierre Olivier"
         solde = 1000
         compte = CompteBancaire( nom, solde )
-        to_check = compte.__str__()
-        i_nom = to_check.find( nom )
-        i_solde = to_check.find( str(solde) )
-        self.assertTrue(
-            i_nom >= 0 and
-            i_solde >= 0
-		)
+        self.assertIn( nom, compte.__str__() )
+        self.assertIn( str(solde), compte.__str__() )
  
     def test_depots_consecutifs(self):
         # TODO: Vérifier que plusieurs dépôts consécutifs s'accumulent correctement
