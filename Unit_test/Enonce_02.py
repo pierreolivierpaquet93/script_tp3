@@ -17,7 +17,7 @@ class TestCompteBancaire(unittest.TestCase):
         # TODO: Vérifier qu'une exception est levée si solde initial < 0
 		# https://stackoverflow.com/questions/129507/how-do-you-test-that-a-python-function-throws-an-exception
         self.assertRaises(
-            Exception,
+            ValueError,
             CompteBancaire,
             "Pierre Olivier",
             -1000
