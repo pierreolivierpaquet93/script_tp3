@@ -27,9 +27,10 @@ class TestCompteBancaire(unittest.TestCase):
     def test_depot_valide(self):
         # TODO: Vérifier qu'un dépôt augmente bien le solde
         solde_initial = 1000
+        depot = 0.01
         compte = CompteBancaire( "Pierre Olivier", solde_initial)
-        compte.deposer( 0.01 )
-        self.assertGreater( compte.solde, solde_initial )
+        compte.deposer( depot )
+        self.assertEqual( compte.solde, solde_initial+depot )
 
     def test_depot_zero(self):
         # TODO: Vérifier qu'un dépôt de 0 déclenche une exception "ValueError"
@@ -52,12 +53,10 @@ class TestCompteBancaire(unittest.TestCase):
     def test_retrait_valide(self):
         # TODO: Vérifier qu'un retrait valide diminue le solde
         solde_initial = 1000
+        retrait = 0.01
         compte = CompteBancaire( "Pierre Olivier", solde_initial )
-        compte.retirer( 0.01 )
-        self.assertLess(
-            compte.solde,
-            solde_initial
-        )
+        compte.retirer( retrait )
+        self.assertEqual( compte.solde, solde_initial-retrait )
 
     def test_retrait_trop_eleve(self):
         # TODO: Vérifier qu'on ne peut pas retirer plus que le solde disponible (déclenche une exception "ValueError")
