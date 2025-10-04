@@ -5,8 +5,9 @@ class TestCompteBancaire(unittest.TestCase):
 
     def test_creation_compte_positif(self):
         # TODO: Vérifier qu'un compte avec solde initial positif est bien créé
+        solde_initial = 1000.0
         compte = CompteBancaire( "Pierre Olivier", 1000.00 )
-        self.assertGreater( compte.solde, 0 )
+        self.assertEqual( compte.solde, 1000.0 )
 
     def test_creation_compte_solde_zero(self):
         # TODO: Vérifier qu'un compte créé sans solde initial a bien solde = 0
