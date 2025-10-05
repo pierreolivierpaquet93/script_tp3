@@ -1,0 +1,4 @@
+[
+    {"machine": "PC-01", "logiciels": ["Chrome", "Notepad++"]},
+    {"machine": "PC-02", "logiciels": ["Wireshark", "Putty", "VSCode"]}
+]
