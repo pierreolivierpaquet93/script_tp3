@@ -32,14 +32,15 @@ function Main(
 	[string]$computer,
 	[string]$program
 ){
-	$installationState = @{
+	$InstallationState = @{
 		$MachineField = $computer;
 		$SoftwareField = $program;
 		$DurationField = -1;
 		$ResultField = $false
 	}
-	Install $installationState
-	return (InstallationJson $installationState)
+	Install $InstallationState
+	Write-Output (InstallationJson $InstallationState)
+	return
 }
 
 Main $machine $logiciel
