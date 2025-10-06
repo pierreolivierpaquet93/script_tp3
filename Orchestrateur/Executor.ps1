@@ -20,7 +20,7 @@ function Install($installationState){
 	$delay = Get-Random -Minimum $DelayMin -Maximum $DelayMax
 	Start-Sleep -Seconds $delay
 	$installationState[$DurationField] = $delay
-	$installationState[$ResultField] = $true, $false | Get-Random
+	$installationState[$ResultField] = 0, 1 | Get-Random
 }
 
 function InstallationJson( $InstallationState ){
@@ -39,7 +39,7 @@ function Main(
 		$ResultField = $false
 	}
 	Install $InstallationState
-	Write-Output (InstallationJson $InstallationState)
+	Write-Host (InstallationJson $InstallationState)
 	return
 }
 
