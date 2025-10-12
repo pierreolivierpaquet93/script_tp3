@@ -33,29 +33,28 @@ class MyInventoryApp( tkinter.Tk ):
 	def FrameLayout( self ):
 		top_height = 60
 		mid_height = 300
-		self._left_top_frame = tkinter.Frame( self, bg="#FF0000" )
+		self._left_top_frame = tkinter.Frame( self )
 		self._left_top_frame.place(x=0,y=0,height=top_height,relwidth=0.45)
-		self._left_mid_frame = tkinter.Frame( self, bg="#FF9900" )
+		self._left_mid_frame = tkinter.Frame( self )
 		self._left_mid_frame.place( x=0, y=0+top_height,height=mid_height,relwidth=0.45 )
-		self._left_bot_frame = tkinter.Frame( self, bg="#D9FF00" )
+		self._left_bot_frame = tkinter.Frame( self )
 		self._left_bot_frame.place( x=0, y=0+top_height+mid_height,height=int(APP_WINDOW_HEIGHT)-top_height-mid_height,relwidth=0.45   )
-		self._right_frame = tkinter.Frame( self, bg="#00FFD5" )
+		self._right_frame = tkinter.Frame( self )
 		self._right_frame.place( relx=0.45, y=0, heigh=APP_WINDOW_HEIGHT, relwidth=0.55 )
-		self._right_top_info_frame = tkinter.Frame( self._right_frame, bg="#5900FF")
+		self._right_top_info_frame = tkinter.Frame( self._right_frame )
 		self._right_top_info_frame.place( relx=0.10, y=top_height+25,relwidth=0.8, height=30 )
-		self._right_mid_info_frame = tkinter.Frame( self._right_frame, bg="#5900FF")
+		self._right_mid_info_frame = tkinter.Frame( self._right_frame )
 		self._right_mid_info_frame.place( relx=0.10, y=top_height+100,relwidth=0.8, height=30 )
-		self._right_bot_info_frame = tkinter.Frame( self._right_frame, bg="#5900FF")
+		self._right_bot_info_frame = tkinter.Frame( self._right_frame )
 		self._right_bot_info_frame.place( relx=0.10, y=top_height+175,relwidth=0.8, height=30 )
 
 	# ----------------------------------------------------------------------
 	def Heading( self, heading: str):
-		self._label_heading = tkinter.Label( self._left_top_frame, text=heading, font=(HEADING_FONT, 20), bg="#FF0000" )
+		self._label_heading = tkinter.Label( self._left_top_frame, text=heading, font=(HEADING_FONT, 20) )
 		self._label_heading.pack(side=tkinter.LEFT, padx=10 )
 
 	# ----------------------------------------------------------------------
 	def ListBox( self ):
-		#STOP
 		self._listbox = tkinter.Listbox(self._left_mid_frame, selectmode=tkinter.SINGLE, width=40)
 		self._listbox.pack(side=tkinter.LEFT, padx=10, fill=tkinter.Y)
 		self._listbox_scrollbar = tkinter.Scrollbar( self._left_mid_frame, orient=tkinter.VERTICAL )
