@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import ttk
 
 # ----------------------------------------------------------------[ CONSTANT.S ]
 
@@ -24,6 +25,9 @@ class MyInventoryApp( tkinter.Tk ):
 		self.ListBox()
 		self.InsertList() #TO delete -> Used for scrollbar tests
 		self.Buttons()
+		self.Labels()
+		self.Entry()
+		self.ComboBox()
 
 	# ----------------------------------------------------------------------
 	def FrameLayout( self ):
@@ -51,6 +55,7 @@ class MyInventoryApp( tkinter.Tk ):
 
 	# ----------------------------------------------------------------------
 	def ListBox( self ):
+		#STOP
 		self._listbox = tkinter.Listbox(self._left_mid_frame, selectmode=tkinter.SINGLE, width=40)
 		self._listbox.pack(side=tkinter.LEFT, padx=10, fill=tkinter.Y)
 		self._listbox_scrollbar = tkinter.Scrollbar( self._left_mid_frame, orient=tkinter.VERTICAL )
@@ -69,6 +74,35 @@ class MyInventoryApp( tkinter.Tk ):
 		self._button_add_product.pack(side=tkinter.LEFT, anchor=tkinter.N, padx=10, pady=10)
 		self._button_del_product = tkinter.Button( self._left_bot_frame, text="Retirer Produit" )
 		self._button_del_product.pack( side=tkinter.LEFT, anchor = tkinter.NW, pady=10 )
+		self._button_update = tkinter.Button( self._right_frame, text="Update Content" )
+		self._button_update.place( relx=0.3, rely=0.74 )
+
+	# ----------------------------------------------------------------------
+	def Labels( self ):
+		self._label_name = tkinter.Label(self._right_top_info_frame, text="Nom du produit:" )
+		self._label_name.place( x=0,y=0 )
+		self._label_type = tkinter.Label( self._right_mid_info_frame, text="Type de produit:" )
+		self._label_type.place(x=0,y=0)
+		self._label_quantity = tkinter.Label( self._right_bot_info_frame, text="Quantité:" )
+		self._label_quantity.place( x=0,y=0 )
+
+	def Entry( self ):
+		self._entry_name = tkinter.Entry( self._right_top_info_frame )
+		self._entry_name.place( rely=0.05,relx=0.3, relwidth=0.70 )
+		self._entry_quantity = tkinter.Entry( self._right_bot_info_frame )
+		self._entry_quantity.place( rely=0.05,relx=0.3, relwidth=0.70 )
+
+	# ----------------------------------------------------------------------
+	def ComboBox( self ):
+		product_types = [
+			"Ordinateur",
+			"Écran",
+			"Clavier",
+			"Souris"
+		]
+		self._combobox = ttk.Combobox(self._right_mid_info_frame, values=product_types, state="readonly" )
+		self._combobox.current(0)
+		self._combobox.place( rely=0.05,relx=0.3, relwidth=0.40 )
 
 # ----------------------------------------------------------------------[ MAIN ]
 def main():
