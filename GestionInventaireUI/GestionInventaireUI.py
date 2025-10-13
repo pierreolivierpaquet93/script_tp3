@@ -1,5 +1,6 @@
 import tkinter
-from tkinter import ttk
+from tkinter import ttk # For ComboBox
+from tkinter import messagebox # For Popup Messages
 
 # ----------------------------------------------------------------[ CONSTANT.S ]
 
@@ -49,7 +50,7 @@ class Product():
 	
 	def SetType( self, new_type: str = "" ):
 		self._type = new_type
- 
+
 # --------------------[ Inventory ]
 
 class Inventory():
@@ -62,6 +63,16 @@ class Inventory():
 		else:
 			new_product = Product()
 			self.__products.append( new_product )
+
+	def RemoveProduct(
+		self,
+		name: str,
+		type: str
+	):
+		for product in self.__products:
+			if product.GetName() == name and product.GetType() == type:
+				self.__products.remove( product )
+				break
 
 	def GetByName( self, name: str = NEW_PRODUCT_NAME ) -> Product:
 		for product in self.__products:
@@ -79,6 +90,19 @@ class Inventory():
 			if product.GetName() == name and product.GetType() == type:
 				quantity += 1
 		return quantity
+
+	def UpdateProducts(
+		self,
+		name: str,
+		new_name: str,
+		type: str,
+		new_type: str
+	):
+		for product in self.__products:
+			if product.GetName() == name and \
+				product.GetType() == type:
+				product.SetName( new_name )
+				product.SetType( new_type )
 
 # --------------------[ MyInventoryApp ]
 
@@ -103,6 +127,7 @@ class MyInventoryApp( tkinter.Tk ):
 
 	def __log( self, msg: str ):
 		self._n_event += 1
+		print( "--------------------------------------------------" )
 		print( f"\t{BLU}{self._n_event} :: {msg}{RST}" )
 
 	# ----------------------------------------------------------------------
@@ -218,7 +243,8 @@ class MyInventoryApp( tkinter.Tk ):
 		)
 		self._button_update = tkinter.Button(
 			self._right_frame,
-			text="Update Content"
+			text="Update Content",
+			command=self.__UpdateContent
 		)
 		self._button_update.place( relx=0.3, rely=0.74 )
 
@@ -274,18 +300,19 @@ class MyInventoryApp( tkinter.Tk ):
 		widget = event.widget
 		selection = widget.curselection()
 		if selection:
-			product_name = widget.get( selection[0] )
-			product = self.inventory.GetByName( product_name )
+			self._current_selection_name = widget.get( selection[0] )
+			self._current_selection_index = self._listbox.curselection()
+			product = self.inventory.GetByName( self._current_selection_name )
 			if product:
-				product_type = product.GetType()
+				self._current_selection_type = product.GetType()
 
 				self._entry_name.config( state=tkinter.NORMAL )
 				self._entry_name.delete( 0, tkinter.END )
-				self._entry_name.insert( 0, product_name )
+				self._entry_name.insert( 0, self._current_selection_name )
 
 				i_type = 0
 				for type in PRODUCT_TYPES:
-					if product_type == type:
+					if self._current_selection_type == type:
 						self._combobox.config( state='readonly' )
 						self._combobox.current(i_type)
 						break
@@ -296,14 +323,38 @@ class MyInventoryApp( tkinter.Tk ):
 				self._entry_quantity.insert(
 					0,
 					self.inventory.GetQuantity(
-						product_name,
-						product_type
+						self._current_selection_name,
+						self._current_selection_type
 					)
 				)
-		else:
-			self._entry_name.delete( 0, tkinter.END )
-			self._entry_name.config( state=tkinter.DISABLED )
 
+	# ---------------------------------------------------------------------
+	def __UpdateContent( self ):
+		current_name = self._entry_name.get()
+		current_type = self._combobox.get()
+		current_quantity = int(self._entry_quantity.get())
+
+		self._listbox.delete( self._current_selection_index )
+		self.inventory.UpdateProducts( 
+			self._current_selection_name,
+			current_name,
+			self._current_selection_type,
+			current_type
+		)
+		actual_quantity = self.inventory.GetQuantity(
+			current_name,
+			current_type
+		)
+		self._listbox.insert( self._current_selection_index, current_name )
+		if current_quantity > actual_quantity:
+			add_n = current_quantity - actual_quantity
+			for n in range( add_n ):
+				new_product = Product( current_name, current_type )
+				self.inventory.AddProduct( new_product )
+		elif current_quantity < actual_quantity:
+			remove_n = actual_quantity - current_quantity
+			for n in range( remove_n ):
+				self.inventory.RemoveProduct( current_name, current_type )
 
 # ----------------------------------------------------------------------[ MAIN ]
 def main():
