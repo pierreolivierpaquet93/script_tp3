@@ -7,6 +7,7 @@ from tkinter import messagebox # For Popup Messages
 MY_INVENTORY_TITLE = "Enonce 04 - Pierre Olivier Paquet"
 MY_INVENTORY_HEADING = "Gestion de l'inventaire"
 HEADING_FONT = "Arial"
+MAX_INVENTORY_QUANTITY = "10000"
 
 APP_WINDOW_WIDTH = "750"
 APP_WINDOW_HEIGHT = "500"
@@ -74,6 +75,19 @@ class Inventory():
 				self.__products.remove( product )
 				break
 
+	# Differs from RemoveAll()
+	def RemoveAllProduct(
+		self,
+		name: str,
+		type: str
+	):
+		remaining_products: list[Product] = []
+		for product in self.__products:
+			if product.GetName() != name and \
+				product.GetType() != type:
+				remaining_products.append( product )
+		self.__products = remaining_products
+
 	def GetByName( self, name: str = NEW_PRODUCT_NAME ) -> Product:
 		for product in self.__products:
 			if product.GetName() == name:
@@ -122,13 +136,6 @@ class MyInventoryApp( tkinter.Tk ):
 		self.Labels()
 		self.Entry()
 		self.ComboBox()
-
-	# ----------------------------------------------------------------------
-
-	def __log( self, msg: str ):
-		self._n_event += 1
-		print( "--------------------------------------------------" )
-		print( f"\t{BLU}{self._n_event} :: {msg}{RST}" )
 
 	# ----------------------------------------------------------------------
 	def FrameLayout( self ):
@@ -234,7 +241,9 @@ class MyInventoryApp( tkinter.Tk ):
 		)
 		self._button_del_product = tkinter.Button(
 			self._left_bot_frame,
-			text="Retirer Produit"
+			text="Retirer Produit",
+			command=self.__RemoveProduct,
+			state=tkinter.DISABLED
 		)
 		self._button_del_product.pack(
 			side=tkinter.LEFT,
@@ -244,7 +253,8 @@ class MyInventoryApp( tkinter.Tk ):
 		self._button_update = tkinter.Button(
 			self._right_frame,
 			text="Update Content",
-			command=self.__UpdateContent
+			command=self.__UpdateContent,
+			state=tkinter.DISABLED
 		)
 		self._button_update.place( relx=0.3, rely=0.74 )
 
@@ -288,18 +298,23 @@ class MyInventoryApp( tkinter.Tk ):
 
 	def __AddProduct( self ):
 		if self.inventory.GetByName():
-			print( "ERROR: the NEW product already exists!" )
+			messagebox.showwarning(
+				"Nouveau produit",
+				( "Un nouveau produit existe déjà.\n" + 
+				"Veuillez modifier le nom du produit ('NEW') " + 
+				"puis cliquez sur 'Update Content'." )
+			)
 			return
 		self.inventory.AddProduct( Product() )
-		self.__log( "New Product has been added to the inventory." )
 		self._listbox.insert( tkinter.END, NEW_PRODUCT_NAME )
-		self.__log( "'NEW' product has been added to the listbox." )
 
 	# ---------------------------------------------------------------------
 	def __DisplaySelection( self, event ):
 		widget = event.widget
 		selection = widget.curselection()
 		if selection:
+			self._button_del_product.config( state=tkinter.NORMAL )
+			self._button_update.config( state=tkinter.NORMAL )
 			self._current_selection_name = widget.get( selection[0] )
 			self._current_selection_index = self._listbox.curselection()
 			product = self.inventory.GetByName( self._current_selection_name )
@@ -332,8 +347,22 @@ class MyInventoryApp( tkinter.Tk ):
 	def __UpdateContent( self ):
 		current_name = self._entry_name.get()
 		current_type = self._combobox.get()
-		current_quantity = int(self._entry_quantity.get())
+		current_quantity = self._entry_quantity.get()
 
+		if current_name == "" or current_type == "":
+			messagebox.showerror(
+				"Entrée invalide",
+				"Les champs vides ne sont pas acceptés."
+			)
+			return
+		try:
+			current_quantity = int( current_quantity )
+		except( ValueError ):
+			messagebox.showerror(
+				"Quantité invalide",
+				"Seules les valeurs entières sont acceptées."
+			)
+			return
 		self._listbox.delete( self._current_selection_index )
 		self.inventory.UpdateProducts( 
 			self._current_selection_name,
@@ -346,7 +375,20 @@ class MyInventoryApp( tkinter.Tk ):
 			current_type
 		)
 		self._listbox.insert( self._current_selection_index, current_name )
-		if current_quantity > actual_quantity:
+		
+		self._current_selection_name = current_name
+		self._current_selection_type = current_type
+		if current_quantity == 0:
+			self.__RemoveProduct()
+		elif current_quantity > actual_quantity:
+			if current_quantity > int( MAX_INVENTORY_QUANTITY ):
+				messagebox.showwarning(
+					"Wait a minute...",
+					f"Quantity is too damn high! (MAX={MAX_INVENTORY_QUANTITY})"
+				)
+				self._entry_quantity.delete( 0, tkinter.END )
+				self._entry_quantity.insert( 0, MAX_INVENTORY_QUANTITY )
+				return
 			add_n = current_quantity - actual_quantity
 			for n in range( add_n ):
 				new_product = Product( current_name, current_type )
@@ -355,6 +397,30 @@ class MyInventoryApp( tkinter.Tk ):
 			remove_n = actual_quantity - current_quantity
 			for n in range( remove_n ):
 				self.inventory.RemoveProduct( current_name, current_type )
+
+	# ---------------------------------------------------------------------
+	def __RemoveProduct( self ):
+		self.inventory.RemoveAllProduct(
+			self._current_selection_name,
+			self._current_selection_type
+		)
+		self._listbox.delete( self._current_selection_index )
+		self.__ClearSelection()
+
+	# ---------------------------------------------------------------------
+	def __ClearSelection( self ):
+		self._entry_name.delete( 0, tkinter.END )
+		self._entry_name.insert( 0, "" ) 
+		self._entry_name.config( state=tkinter.DISABLED )
+		self._entry_quantity.delete( 0, tkinter.END )
+		self._entry_quantity.insert( 0, "" )
+		self._entry_quantity.config( state=tkinter.DISABLED )
+		self._combobox.current( 0 )
+		self._combobox.config( state=tkinter.DISABLED )
+		self._current_selection_name = NEW_PRODUCT_NAME
+		self._current_selection_type = NEW_PRODUCT_TYPE
+		self._button_update.config( state=tkinter.DISABLED )
+		self._button_del_product.config( state=tkinter.DISABLED )
 
 # ----------------------------------------------------------------------[ MAIN ]
 def main():
