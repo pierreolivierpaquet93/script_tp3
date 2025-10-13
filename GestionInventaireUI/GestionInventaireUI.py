@@ -11,13 +11,66 @@ APP_WINDOW_WIDTH = "750"
 APP_WINDOW_HEIGHT = "500"
 APP_WINDOW_RES = f"{APP_WINDOW_WIDTH}x{APP_WINDOW_HEIGHT}"
 
+PRODUCT_TYPES = [
+	"Ordinateur",
+	"Écran",
+	"Clavier",
+	"Souris"
+]
+NEW_PRODUCT_NAME = "NEW"
+NEW_PRODUCT_TYPE = ""
+
+ESC = "\033["
+BLU = f"{ESC}1;34m"
+RST = f"{ESC}0m"
+
 # ------------------------------------------------------------------[ CLASSE.S ]
+
+# --------------------[ Product ]
+
+class Product():
+	def __init__(
+		self,
+		name: str = NEW_PRODUCT_NAME,
+		type: str = NEW_PRODUCT_TYPE
+	):
+		self._name = name
+		self._type = type
+	
+	def GetName( self ):
+		return self._name
+
+	def SetName( self, new_name: str = "" ):
+		self._name = new_name
+
+	def GetType( self ):
+		return self._type
+	
+	def SetType( self, new_type: str = "" ):
+		self._type = new_type
+ 
+# --------------------[ Inventory ]
+
+class Inventory():
+	def __init__( self ):
+		self.__products: list[Product] = []
+
+	def AddProduct( self, item: Product = None ):
+		if item:
+			self.__products.append( item )
+		else:
+			new_product = Product()
+			self.__products.append( new_product )
+
+# --------------------[ MyInventoryApp ]
 
 # MyInventoryApp inherits from Tk
 # so it becomes a Window
 class MyInventoryApp( tkinter.Tk ):
 	def __init__( self ):
 		super().__init__()
+		self._n_event = 0
+		self.inventory = Inventory()
 		self.geometry( APP_WINDOW_RES )
 		self.title( MY_INVENTORY_TITLE )
 		self.FrameLayout()
@@ -27,6 +80,12 @@ class MyInventoryApp( tkinter.Tk ):
 		self.Labels()
 		self.Entry()
 		self.ComboBox()
+
+	# ----------------------------------------------------------------------
+
+	def __log( self, msg: str ):
+		self._n_event += 1
+		print( f"\t{BLU}{self._n_event} :: {msg}{RST}" )
 
 	# ----------------------------------------------------------------------
 	def FrameLayout( self ):
@@ -119,7 +178,8 @@ class MyInventoryApp( tkinter.Tk ):
 	def Buttons( self ):
 		self._button_add_product = tkinter.Button(
 			self._left_bot_frame,
-			text="Ajouter Produit"
+			text="Ajouter Produit",
+			command=self.AddProduct
 		)
 		self._button_add_product.pack(
 			side=tkinter.LEFT,
@@ -168,19 +228,20 @@ class MyInventoryApp( tkinter.Tk ):
 
 	# ----------------------------------------------------------------------
 	def ComboBox( self ):
-		product_types = [
-			"Ordinateur",
-			"Écran",
-			"Clavier",
-			"Souris"
-		]
 		self._combobox = ttk.Combobox(
 			self._right_mid_info_frame,
-			values=product_types,
+			values=PRODUCT_TYPES,
 			state="readonly"
 		)
 		self._combobox.current(0)
 		self._combobox.place( rely=0.05, relx=0.3, relwidth=0.40 )
+
+	def AddProduct( self ):
+		self.inventory.AddProduct( Product() )
+		self.__log( "New Product has been added to the inventory." )
+		self._listbox.insert( tkinter.END, NEW_PRODUCT_NAME )
+		self.__log( "'NEW' product has been added to the listbox." )
+
 
 # ----------------------------------------------------------------------[ MAIN ]
 def main():
